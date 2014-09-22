@@ -1,0 +1,47 @@
+from django.shortcuts import render
+from rest_framework import viewsets, status
+from rest_framework.permissions import AllowAny
+from maint.serializers import *
+from rest_framework.decorators import detail_route, list_route
+from rest_framework.response import Response
+
+class IssueViewSet(viewsets.ModelViewSet):
+    queryset = Issue.objects.all()
+    serializer_class = IssueSerializer
+    permission_classes = [AllowAny]
+
+    @list_route(methods=['PUT','POST'])
+    def bulk(self,request):
+        for datum in request.DATA:
+            if int(datum['id']) < 0:
+                print "New issue: %d" % datum['id']
+                del datum['id']
+                i = Issue(type=datum['type'],
+                          unit_number=datum['unit_number'],
+                          description=datum['description'],
+                          date_performed=datum['date_performed'],
+                          brand=datum['brand'],
+                          model_number=datum['model_number'],
+                          price_paid=datum['price_paid'],
+                          who_completed=datum['who_completed'],
+                          who_contractor=datum['who_contractor'],
+                          rate_charged=datum['rate_charged'],
+                          comments=datum['comments'])
+                i.save()
+
+            else:
+                i = Issue.objects.get(pk=datum['id'])
+                i.unit_number = datum['unit_number']
+                i.type        = datum['type']
+                i.description = datum['description']
+                i.date_performed = datum['date_performed']
+                i.brand = datum['brand']
+                i.model_number = datum['model_number']
+                i.price_paid = datum['price_paid']
+                i.who_completed = datum['who_completed']
+                i.who_contractor = datum['who_contractor']
+                i.rate_charged = datum['rate_charged']
+                i.comments = datum['comments']
+                i.save()
+
+        return Response(status=200)
