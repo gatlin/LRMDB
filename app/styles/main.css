@@ -86,3 +86,13 @@ body {
     height: 100%;
     max-width: 100%;
 }
+
+#data-row {
+    height: 100%;
+    overflow: scroll;
+}
+
+#data-table {
+    height: 100%;
+    overflow: scroll;
+}

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * @ngdoc function
  * @name maintApp.controller:MainCtrl
@@ -8,7 +6,14 @@
  * Controller of the maintApp
  */
 angular.module('maintApp')
-  .controller('MainCtrl', function ($scope) {
+  .value('maintVals', [
+         { "val": 0, "text": "Repair" }
+        ,{ "val": 1, "text": "Replacement" }
+        ,{ "val": 2, "text": "Preventative" }
+        ,{ "val": 3, "text": "Other" }
+        ])
+
+  .controller('MainCtrl', function ($scope, $rootScope, maintVals, $http) {
 
       /**
        * Schema for our data:
@@ -26,96 +31,128 @@ angular.module('maintApp')
        * - comments
        */
 
-      $scope.typesOfMaintenance = {
-          REPAIR: 0,
-          REPLACEMENT: 1,
-          PREVENTATIVE: 2,
-          OTHER: 3
+      $scope.maintVals = maintVals;
+
+      $scope.pivot = "id";
+      $scope.asc   = true;
+      $scope.dirty = false;
+      $scope.setDirty = function (which) {
+          $scope.dirty = true;
       };
 
-      $scope.rows = [{
-          "type": $scope.typesOfMaintenance.REPAIR,
-          "description": "richard ruined his toilet",
-          "unit": "201",
-          "date_performed": moment("2014-09-11").format("YYYY-MM-DD"),
-          "brand": "",
-          "model_number": "",
-          "price_paid": "200.00",
-          "who_completed": "mcallen",
-          "who_contractor": "",
-          "rate_charged": "",
-          "comments": "holy shit that was disgusting"
-      },{
-          "type": $scope.typesOfMaintenance.REPAIR,
-          "description": "gatlin needs his toilet plunged",
-          "unit": "201",
-          "date_performed": moment("2014-09-28").format("YYYY-MM-DD"),
-          "brand": "",
-          "model_number": "",
-          "price_paid": "0.00",
-          "who_completed": "mcallen",
-          "who_contractor": "",
-          "rate_charged": "",
-          "comments": "gatlin is an asshole"
-      },{
-          "type": $scope.typesOfMaintenance.REPAIR,
-          "description": "fritz chewed up the commons couch",
-          "unit": "106",
-          "date_performed": moment("2014-08-07").format("YYYY-MM-DD"),
-          "brand": "",
-          "model_number": "",
-          "price_paid": "200.00",
-          "who_completed": "n/a",
-          "who_contractor": "",
-          "rate_charged": "",
-          "comments": "what an awful creature"
-      }];
-
-      $scope.data = {
-          data: "rows",
-          enableCellEditOnFocus: true,
-          enableRowSelection: true,
-          showGroupPanel: true,
-          enableCellEdit: true,
-          enablePinning: true,
-          enableColumnResize: true,
-          maintainColumnRatios: false,
-          showFilter: true,
-          plugins: [new ngGridFlexibleHeightPlugin()]
+      $scope.sortBy = function(which) {
+          if (which === $scope.pivot) {
+              $scope.asc = !$scope.asc;
+          }
+          $scope.pivot = which;
       };
+
+      $scope.freshId = (function() {
+          var _id = 1;
+          return function() {
+              return (-1)*++_id;
+          };
+      })();
+
+      // ids of local rows which have been updated
+      $scope.updated = [];
+
+      $scope.schema = [ { "name": "type", "human_name": "Type" }
+                      , { "name": "description"
+                        , "human_name": "Description" }
+                      , { "name": "unit_number"
+                        , "human_name": "Unit #" }
+                      , { "name": "date_performed"
+                        , "human_name": "Date" }
+                      , { "name": "brand"
+                        , "human_name": "Brand" }
+                      , { "name": "model_number"
+                        , "human_name": "Model #" }
+                      , { "name": "price_paid"
+                        , "human_name": "Price Paid" }
+                      , { "name": "who_completed"
+                        , "human_name": "Who?" }
+                      , { "name": "who_contractor"
+                        , "human_name": "Contractor?" }
+                      , { "name": "rate_charged"
+                        , "human_name": "Rate Charged" }
+                      , { "name": "comments"
+                        , "human_name": "Comments" }
+                      ];
+
+      $scope.rows = [];
+      $scope.getIssues = function() {
+          $http({
+              "method": "GET",
+              "url":    "/api/v1/issues/"
+          })
+            .success(function(data) {
+                $scope.rows = data.results;
+            });
+      };
+
+      $scope.getIssues();
+      $scope.t = true;
 
       $scope.addRow = function() {
           $scope.rows.push({
-              "type": $scope.typesOfMaintenance.OTHER,
-              "description":"",
-              "unit":"",
-              "date_performed": moment().format("YYYY-MM-DD"),
-              "brand": "",
-              "model_number": "",
-              "price_paid": "",
-              "who_completed":"",
-              "who_contractor":"",
-              "rate_charged":"",
-              "comments":""
+              "id": $scope.freshId(),
+              "type": maintVals[3].val,
+              "description":"n/a",
+              "unit":"n/a",
+              "date_performed": "",
+              "brand": "n/a",
+              "model_number": "n/a",
+              "price_paid": "n/a",
+              "who_completed":"n/a",
+              "who_contractor":"n/a",
+              "rate_charged":"n/a",
+              "comments":"n/a"
           });
+          $scope.asc = true;
+          $scope.pivot = "id";
+          $scope.dirty = true;
       };
+
+      // O(n) runtime, but I have other fish to fry
+      $scope.removeRow = function(which) {
+          for (var i = 0; i < $scope.rows.length; i++) {
+              if ($scope.rows[i].id === which) {
+                  $scope.rows.splice(i,1);
+                  break;
+              }
+          }
+          $http({
+              "method":"POST",
+              "url":"/api/v1/issues/"+which+"/",
+              "headers":{
+                  "X-HTTP-Method-Override":"DELETE"
+              }
+          }).
+                success(function(data) {
+                    console.log("successfully deleted it");
+                });
+      };
+
+      $scope.saveIssues = function() {
+          $http({
+              "method": "POST",
+              "url": "/api/v1/issues/bulk/",
+              "data": $scope.rows,
+              "headers":{
+                  "X-HTTP-Method-Override":"PUT"
+              }
+          })
+            .success(function(data) {
+                console.log(data);
+                $scope.dirty = false;
+                $scope.getIssues();
+            });
+      };
+
   })
-  .filter('maintenanceType', function() {
+  .filter('maintenanceType', function(maintVals) {
       return function(input) {
-          var which = null;
-          switch (input) {
-              case 0:
-                  which = "Repair";
-                  break;
-              case 1:
-                  which = "Replacement";
-                  break;
-              case 2:
-                  which = "Preventative";
-                  break;
-              case 3:
-                  which = "Other";
-          };
-          return which;
+          return maintVals[input].text;
       };
   });

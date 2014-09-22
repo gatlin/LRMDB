@@ -16,17 +16,17 @@ angular
     'ngRoute',
     'ngSanitize',
     'ngTouch',
-    'ngGrid'
+    'xeditable'
   ])
+  .run(function($http, $cookies) {
+      $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+      $http.defaults.headers.common['X-CSRFToken'] = $cookies.csrftoken;
+  })
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {
         templateUrl: 'views/main.html',
         controller: 'MainCtrl'
-      })
-      .when('/about', {
-        templateUrl: 'views/about.html',
-        controller: 'AboutCtrl'
       })
       .otherwise({
         redirectTo: '/'
