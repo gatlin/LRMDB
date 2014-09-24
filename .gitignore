@@ -9,3 +9,4 @@ ve
 *.swo
 .DS_Store
 *.pyc
+server/db.sqlite3
