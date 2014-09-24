@@ -150,6 +150,10 @@ angular.module('maintApp')
             });
       };
 
+      if ($scope.rows.length === 0) {
+          $scope.addRow();
+      }
+
   })
   .filter('maintenanceType', function(maintVals) {
       return function(input) {
