@@ -1,9 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from rest_framework import viewsets, status
 from rest_framework.permissions import AllowAny
 from maint.serializers import *
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
+
+def index(request):
+    return redirect("/static/maint/index.html")
 
 class IssueViewSet(viewsets.ModelViewSet):
     queryset = Issue.objects.all()
