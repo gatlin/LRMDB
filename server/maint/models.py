@@ -20,7 +20,7 @@ class Issue(models.Model):
     type = models.IntegerField(null=True,blank=True)
     description = models.CharField(max_length=500,null=True,blank=True)
     unit_number = models.CharField(max_length=500,null=True,blank=True)
-    date_performed = models.DateTimeField(auto_now_add=True)
+    date_performed = models.DateTimeField(null=True,blank=True)
     brand = models.CharField(max_length=500,null=True,blank=True)
     model_number = models.CharField(max_length=500,null=True,blank=True)
     price_paid = models.CharField(max_length=500,null=True,blank=True)

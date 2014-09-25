@@ -100,7 +100,7 @@ angular.module('maintApp')
               "type": maintVals[3].val,
               "description":"n/a",
               "unit":"n/a",
-              "date_performed": "",
+              "date_performed": "0000-00-00 00:00",
               "brand": "n/a",
               "model_number": "n/a",
               "price_paid": "n/a",

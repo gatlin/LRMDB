@@ -61,7 +61,10 @@
                         </span>
                     </td>
                     <td>
-                            {{issue.date_performed}}
+                        <span editable-text="issue.date_performed"
+                              onaftersave="setDirty(issue.id)">
+                            {{issue.date_performed || '(none)'}}
+                        </span>
                     </td>
                     <td>
                         <span editable-text="issue.brand"
