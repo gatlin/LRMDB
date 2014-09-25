@@ -21,16 +21,25 @@ class IssueViewSet(viewsets.ModelViewSet):
             if int(datum['id']) < 0:
                 print "New issue: %d" % datum['id']
                 del datum['id']
+                d = None
+                if datum['date_performed'] != '0000-00-00 00:00':
+                    d = datum=['date_performed']
+                p = "n/a"
+                if datum['price_paid'] != '':
+                    p = datum['price_paid']
+                r = 'n/a'
+                if datum['rate_charged'] != '':
+                    r = datum['rate_charged']
                 i = Issue(type=datum['type'],
                           unit_number=datum['unit_number'],
                           description=datum['description'],
-                          date_performed=datum['date_performed'],
+                          date_performed=d,
                           brand=datum['brand'],
                           model_number=datum['model_number'],
-                          price_paid=datum['price_paid'],
+                          price_paid=p,
                           who_completed=datum['who_completed'],
                           who_contractor=datum['who_contractor'],
-                          rate_charged=datum['rate_charged'],
+                          rate_charged=r,
                           comments=datum['comments'])
                 i.save()
 

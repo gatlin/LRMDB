@@ -84,7 +84,7 @@
                         <span editable-text="issue.price_paid"
                             onaftersave="setDirty(issue.id)"
                             >
-                            {{issue.price_paid || '0' | currency}}
+                            {{issue.price_paid || currency}}
                         </span>
                     </td>
                     <td>
@@ -105,7 +105,7 @@
                         <span editable-text="issue.rate_charged"
                             onaftersave="setDirty(issue.id)"
                             >
-                            {{issue.rate_charged || '0' | currency}}
+                            {{issue.rate_charged || currency}}
                         </span>
                     </td>
                     <td>

@@ -103,10 +103,10 @@ angular.module('maintApp')
               "date_performed": "0000-00-00 00:00",
               "brand": "n/a",
               "model_number": "n/a",
-              "price_paid": "n/a",
+              "price_paid": "0",
               "who_completed":"n/a",
               "who_contractor":"n/a",
-              "rate_charged":"n/a",
+              "rate_charged":"0",
               "comments":"n/a"
           });
           $scope.asc = true;
