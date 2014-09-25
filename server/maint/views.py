@@ -4,7 +4,9 @@ from rest_framework.permissions import AllowAny
 from maint.serializers import *
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def index(request):
     return redirect("/static/maint/index.html")
 
