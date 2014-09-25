@@ -11,3 +11,4 @@ ve
 *.pyc
 server/db.sqlite3
 server/maint/static
+server/static
